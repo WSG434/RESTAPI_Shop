@@ -37,35 +37,8 @@ class ProductController extends Controller
         ]);
     }
 
-    public function show(Product $product)
-    {
-        // TODO: перенести в middleware
-        if ($product->status === ProductStatus::Draft){
-               return response() -> json([
-                   'message' => 'Product not found'
-               ], 404);
-        }
-
-        return [
-          'id' => $product->id,
-          'name' => $product->name,
-          'description' => $product->description,
-          'rating' => $product->rating(),
-          'images' => $product->images->map(fn(ProductImage $image) => $image->url),
-          'price' => $product->price,
-          'count' => $product->count,
-          'reviews'=> $product->reviews->map(fn(ProductReview $review) => [
-              'id' => $review->id,
-              'userName' => $review->user->name,
-              'text' => $review->text,
-              'rating' => $review->rating,
-          ]),
-        ];
-    }
-
     public function store(StoreProductRequest $request)
     {
-
         /** @var Product $product */
         $product = auth()->user()->products()->create([
             'name' => $request->str('name'),
@@ -87,7 +60,33 @@ class ProductController extends Controller
         ], 201);
     }
 
-    public function review(Product $product, StoreReviewRequest $request)
+    public function show(Product $product)
+    {
+        // TODO: перенести в middleware
+        if ($product->status === ProductStatus::Draft){
+            return response() -> json([
+                'message' => 'Product not found'
+            ], 404);
+        }
+
+        return [
+            'id' => $product->id,
+            'name' => $product->name,
+            'description' => $product->description,
+            'rating' => $product->rating(),
+            'images' => $product->images->map(fn(ProductImage $image) => $image->url),
+            'price' => $product->price,
+            'count' => $product->count,
+            'reviews'=> $product->reviews->map(fn(ProductReview $review) => [
+                'id' => $review->id,
+                'userName' => $review->user->name,
+                'text' => $review->text,
+                'rating' => $review->rating,
+            ]),
+        ];
+    }
+
+    public function addReview(Product $product, StoreReviewRequest $request)
     {
         return $product->reviews()->create([
             'user_id' => auth()->id(),
@@ -100,11 +99,11 @@ class ProductController extends Controller
     {
         if ($request->method() === 'PUT'){
             $product->update([
-               'name' => $request->input('name'),
-               'description' => $request->input('description'),
-               'price' => $request->input('price'),
-               'count' => $request->input('count'),
-               'status' => $request->enum('status', ProductStatus::class),
+                'name' => $request->input('name'),
+                'description' => $request->input('description'),
+                'price' => $request->input('price'),
+                'count' => $request->input('count'),
+                'status' => $request->enum('status', ProductStatus::class),
             ]);
         } else {
             $data = [];
@@ -142,5 +141,4 @@ class ProductController extends Controller
             'status' => 'success'
         ]);
     }
-
 }
