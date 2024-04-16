@@ -9,8 +9,6 @@ use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductReview;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
@@ -18,8 +16,9 @@ class ProductController extends Controller
 
     public function __construct()
     {
+//        $this->middleware('auth:sanctum')->only(['store', 'update', 'review', 'destroy']);
         //TODO: убрать, когда буду работать с авторизацией
-        auth()->login(User::query()->inRandomOrder()->whereIsAdmin(true)->first());
+//        auth()->login(User::query()->inRandomOrder()->whereIsAdmin(true)->first());
     }
 
     public function index()
@@ -39,6 +38,8 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
+        $token = $request->bearerToken();
+
         /** @var Product $product */
         $product = auth()->user()->products()->create([
             'name' => $request->str('name'),

@@ -6,10 +6,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::apiResource('products', ProductController::class);
 
-Route::controller(\App\Http\Controllers\ProductController::class)
-    ->prefix('products')
-    ->group(function (){
-        Route::post('{product}/review', 'addReview')->name('products.add_review');
-    });
+Route::post('products/{product}/review', [ProductController::class, 'review'])
+    ->name('products.add_review');
 
-
+Route::controller(\App\Http\Controllers\UserController::class)->group(function(){
+   Route::post('login','login')->name('login');
+});
