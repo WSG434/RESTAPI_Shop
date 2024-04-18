@@ -50,4 +50,9 @@ class Product extends Model
         return $this->status === ProductStatus::Draft;
     }
 
+    public function imageList(): array
+    {
+        return $this->images->map(fn(ProductImage $image) => $image->url)->toArray();
+    }
+
 }

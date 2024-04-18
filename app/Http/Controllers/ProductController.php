@@ -6,6 +6,8 @@ use App\Enums\ProductStatus;
 use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\StoreReviewRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
+use App\Http\Resources\Product\MinifiedProductResource;
+use App\Http\Resources\Product\ProductResource;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductReview;
@@ -29,18 +31,11 @@ class ProductController extends Controller
             ->whereStatus(ProductStatus::Published)
             ->get();
 
-        return $products->map(fn(Product $product) => [
-            'id' => $product->id,
-            'name' => $product->name,
-            'price' => $product->price,
-            'rating' => $product->rating()
-        ]);
+        return MinifiedProductResource::collection($products);
     }
 
     public function store(StoreProductRequest $request)
     {
-        $token = $request->bearerToken();
-
         /** @var Product $product */
         $product = auth()->user()->products()->create([
             'name' => $request->str('name'),
@@ -64,21 +59,7 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        return [
-            'id' => $product->id,
-            'name' => $product->name,
-            'description' => $product->description,
-            'rating' => $product->rating(),
-            'images' => $product->images->map(fn(ProductImage $image) => $image->url),
-            'price' => $product->price,
-            'count' => $product->count,
-            'reviews'=> $product->reviews->map(fn(ProductReview $review) => [
-                'id' => $review->id,
-                'userName' => $review->user->name,
-                'text' => $review->text,
-                'rating' => $review->rating,
-            ]),
-        ];
+        return new ProductResource($product);
     }
 
     public function addReview(Product $product, StoreReviewRequest $request)
