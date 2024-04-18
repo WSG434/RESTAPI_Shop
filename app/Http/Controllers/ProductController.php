@@ -15,6 +15,7 @@ use App\Models\ProductReview;
 use App\Services\Product\ProductService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Controller;
+use App\Facades\Product as ProductFacade;
 
 class ProductController extends Controller
 {
@@ -26,14 +27,16 @@ class ProductController extends Controller
         $this->middleware('product.draft')->only('show');
     }
 
-    public function index(ProductService $service)
+    public function index()
     {
-        return MinifiedProductResource::collection($service->published());
+        return MinifiedProductResource::collection(
+            ProductFacade::published()
+        );
     }
 
-    public function store(StoreProductRequest $request, ProductService $service)
+    public function store(StoreProductRequest $request)
     {
-        return new ProductResource($service->store($request));
+        return new ProductResource(ProductFacade::store($request));
     }
 
     public function show(Product $product)
@@ -41,16 +44,16 @@ class ProductController extends Controller
         return new ProductResource($product);
     }
 
-    public function addReview(Product $product, StoreReviewRequest $request, ProductService $service)
+    public function addReview(Product $product, StoreReviewRequest $request)
     {
         return new ProductReviewResource(
-            $service->setProduct($product)->addReview($request)
+            ProductFacade::setProduct($product)->addReview($request)
         );
     }
 
-    public function update(Product $product, UpdateProductRequest $request, ProductService $service)
+    public function update(Product $product, UpdateProductRequest $request)
     {
-        $product = $service->setProduct($product)->update($request);
+        $product = ProductFacade::setProduct($product)->update($request);
 
         return new ProductResource($product);
     }
