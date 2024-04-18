@@ -10,15 +10,16 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductReview;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Routing\Controller;
 
 class ProductController extends Controller
 {
 
     public function __construct()
     {
-//        $this->middleware('auth:sanctum')->only(['store', 'update', 'review', 'destroy']);
-        //TODO: убрать, когда буду работать с авторизацией
-//        auth()->login(User::query()->inRandomOrder()->whereIsAdmin(true)->first());
+        $this->middleware('auth:sanctum')->only(['store', 'update', 'review', 'destroy']);
+        $this->middleware('admin')->only(['store', 'update', 'destroy']);
+        $this->middleware('product.draft')->only('show');
     }
 
     public function index()
@@ -63,13 +64,6 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        // TODO: перенести в middleware
-        if ($product->status === ProductStatus::Draft){
-            return response() -> json([
-                'message' => 'Product not found'
-            ], 404);
-        }
-
         return [
             'id' => $product->id,
             'name' => $product->name,
