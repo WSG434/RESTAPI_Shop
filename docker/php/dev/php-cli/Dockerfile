@@ -13,7 +13,7 @@ RUN apt-get install -y apt-utils \
     ca-certificates \
     wget
 
-
+RUN docker-php-ext-install gd
 RUN docker-php-ext-install pdo_mysql pcntl
 RUN docker-php-ext-configure exif
 RUN docker-php-ext-install exif

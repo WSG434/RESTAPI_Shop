@@ -18,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions -> render(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e){
+            return responseFailed(getMessage('model_not_found'),404);
+        });
         $exceptions -> render(function (\App\Exceptions\Product\ProductNotFoundException $e){
                return responseFailed($e->getMessage(), $e->getCode());
         });
