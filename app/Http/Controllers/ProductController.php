@@ -12,6 +12,7 @@ use App\Http\Resources\Product\ProductReviewResource;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductReview;
+use App\Services\Product\DTO\CreateProductDTO;
 use App\Services\Product\ProductService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Controller;
@@ -36,7 +37,7 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-        return new ProductResource(ProductFacade::store($request));
+        return new ProductResource(ProductFacade::store($request->DTO()));
     }
 
     public function show(Product $product)

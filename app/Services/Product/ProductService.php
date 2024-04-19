@@ -8,7 +8,9 @@ use App\Http\Requests\Product\StoreReviewRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\Product;
 use App\Models\ProductReview;
+use App\Services\Product\DTO\CreateProductDTO;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
 
 class ProductService
@@ -23,22 +25,24 @@ class ProductService
             ->get();
     }
 
-    public function store(StoreProductRequest $request): Product
+    public function store(CreateProductDTO $DTO): Product
     {
-        /** @var Product $product */
-        $product = auth()->user()->products()->create([
-            'name' => $request->str('name'),
-            'description' => $request->str('description'),
-            'price' => $request->integer('price'),
-            'count' => $request->integer('count'),
-            'status' => $request->enum('status', ProductStatus::class),
-        ]);
 
-        foreach ($request->file('images') as $item){
-            $path = $item->storePublicly('images');
-            $product->images()->create([
-                'url' => config('app.url') . Storage::url($path)
-            ]);
+        $images = Arr::get($DTO->toArray(), 'images');
+
+        /** @var Product $product */
+        $product = auth()->user()->products()->create(
+            $DTO->except('images')->toArray()
+        );
+
+        if (!empty($images)){
+            foreach ($images as $image){
+                $path = $image->storePublicly('images');
+
+                $product->images()->create([
+                    'url' => config('app.url') . Storage::url($path)
+                ]);
+            }
         }
 
         return $product;

@@ -4,6 +4,7 @@ namespace App\Http\Requests\Product;
 
 use App\Enums\ProductStatus;
 use App\Http\Requests\ApiRequest;
+use App\Services\Product\DTO\CreateProductDTO;
 use Illuminate\Validation\Rules\Enum;
 
 class StoreProductRequest extends ApiRequest
@@ -18,5 +19,10 @@ class StoreProductRequest extends ApiRequest
             'status' => ['required', new Enum(ProductStatus::class)],
             'images.*' => ['image'],
         ];
+    }
+
+    public function DTO() : CreateProductDTO
+    {
+        return CreateProductDTO::from($this->validated());
     }
 }
