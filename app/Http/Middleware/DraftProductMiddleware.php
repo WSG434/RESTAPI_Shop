@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Enums\ProductStatus;
+use App\Exceptions\Product\ProductNotFoundException;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,9 +21,7 @@ class DraftProductMiddleware
         $product =  $request->route('product');
 
         if ($product->isDraft()){
-            return response() -> json([
-                'message' => 'Product not found'
-            ], 404);
+            throw new ProductNotFoundException();
         }
 
         return $next($request);

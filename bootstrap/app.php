@@ -18,5 +18,13 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions -> render(function (\App\Exceptions\Product\ProductNotFoundException $e){
+               return responseFailed($e->getMessage(), $e->getCode());
+        });
+        $exceptions -> render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e){
+           return responseFailed(getMessage('route_not_found'), 404);
+        });
+        $exceptions -> render(function (\Illuminate\Auth\AuthenticationException $e){
+            return responseFailed(getMessage('auth_error'), 401);
+        });
     })->create();
